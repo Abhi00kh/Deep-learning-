@@ -1,0 +1,43 @@
+
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.8.2 <0.9.0;
+
+contract StudentData {
+    struct Student {
+        uint id;
+        string name;
+        uint age;
+    }
+
+    Student[] public students;
+    address public owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this operation");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function addStudent(uint _id, string memory _name, uint _age) external onlyOwner {
+        students.push(Student(_id, _name, _age));
+    }
+
+    function getStudent(uint index) external view returns (uint, string memory, uint) {
+        require(index < students.length, "Invalid index");
+        Student memory student = students[index];
+        return (student.id, student.name, student.age);
+    }
+
+    function updateStudent(uint index, string memory _name, uint _age) external onlyOwner {
+        require(index < students.length, "Invalid index");
+        students[index].name = _name;
+        students[index].age = _age;
+    }
+
+    fallback() external {
+        revert("Fallback function: This contract does not accept Ether.");
+    }
+}
